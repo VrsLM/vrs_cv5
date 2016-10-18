@@ -10,5 +10,10 @@
 
 //void setNVIC(void);
 void delay(int);
+void led_init(void);
+void usart_init(void);
+
+uint16_t readValue(void);
+void adc_init(void);
 
 #endif /* VRS_CV5_H_ */
