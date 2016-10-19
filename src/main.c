@@ -4,26 +4,14 @@
 #include "stm32l1xx.h"
 #include "vrs_cv5.h"
 
-int value;
-uint16_t  AD_value;
+extern uint16_t  AD_value;
 
 int main(void) {
-	led_init();
 	adc_init();
-	usart_init();
-
-	int value;
+//	usart_init();
 
 	while (1) {
-		value = readValue();
 
-		if (value < 2050) {
-			delay(50000);
-			GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-		} else if (2800 < value && value < 3000) {
-			delay(120000);
-			GPIO_ToggleBits(GPIOA, GPIO_Pin_5);
-		}
 	}
 	return 0;
 }
