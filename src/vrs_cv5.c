@@ -4,11 +4,10 @@
  *  Created on: 18. 10. 2016
  *      Author: Lukas
  */
-#include <stddef.h>
-#include "stm32l1xx.h"
 #include "vrs_cv5.h"
 
 uint16_t  AD_value;
+uint8_t message = 0;
 GPIO_InitTypeDef GPIO_InitStructure; //tlacidlo
 ADC_InitTypeDef ADC_InitStructure;
 NVIC_InitTypeDef NVIC_InitStructure;
@@ -53,7 +52,7 @@ void adc_init(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; // 0 najvacsia priorita
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
@@ -70,6 +69,14 @@ void usart_init(void) {
 	//zapn˙ù hodiny
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // GPIO Alternate function Mode
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2 );
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_USART2 );
+
 	//nastavenie ötrukt˙ry
 	USART_StructInit(&USART_InitStructure);
 	USART_InitStructure.USART_BaudRate = 9600;
@@ -79,12 +86,12 @@ void usart_init(void) {
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_Init(USART2, &USART_InitStructure);
-	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE); //USART_IT_RXNE: Receive Data register not empty interrupt.
 
 	//nastavenie ötrukt˙ry
 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1; //cim vacsie cislo tym mensia priorita
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_Init(&NVIC_InitStructure);
 
@@ -94,6 +101,12 @@ void usart_init(void) {
 void ADC1_IRQHandler() {
 	if (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) {
 		AD_value = ADC_GetConversionValue(ADC1);
+	}
+}
+
+void USART2_IRQHandler() {
+	if (USART_GetFlagStatus(USART2, USART_IT_RXNE)) {
+		message = USART_ReceiveData(USART2);
 	}
 }
 

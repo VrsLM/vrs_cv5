@@ -1,16 +1,21 @@
 /* Includes */
 #include <stddef.h>
 #include <stdio.h>
-#include "stm32l1xx.h"
+//#include "stm32l1xx.h"
 #include "vrs_cv5.h"
 
 extern uint16_t  AD_value;
+extern uint8_t message;
 
 int main(void) {
 	adc_init();
 //	usart_init();
 
 	while (1) {
+		if (message == 'm'){
+			USART_SendData(USART2, 'x');
+			message = 0;
+		}
 
 	}
 	return 0;
