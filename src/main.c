@@ -9,7 +9,6 @@ int main(void) {
 	usart_init();
 	while (1) {
 		sendData();
-		USART_ITConfig(USART2, USART_IT_TXE, ENABLE); // Enable when something to send
 		delay(500000);
 	}
 	return 0;

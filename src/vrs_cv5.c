@@ -147,6 +147,10 @@ void sendData() {
 	} else {
 		sprintf(pole, "%d\r\n", AD_value);
 	}
+
+	if (sizeof(pole) != 0){
+		USART_ITConfig(USART2, USART_IT_TXE, ENABLE); // Enable when something to send
+	}
 }
 
 void delay(int i) {
