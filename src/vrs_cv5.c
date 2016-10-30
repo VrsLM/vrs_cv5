@@ -9,6 +9,7 @@
 uint16_t AD_value;
 uint8_t pom = 1;
 uint8_t message = 0;
+int i = 0;
 
 char pole[10];
 int intNum;
@@ -99,9 +100,10 @@ void usart_init(void) {
 	USART_InitStructure.USART_Parity = USART_Parity_No;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	USART_InitStructure.USART_HardwareFlowControl =
-			USART_HardwareFlowControl_None;
+	USART_HardwareFlowControl_None;
 	USART_Init(USART2, &USART_InitStructure);
 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE); //USART_IT_RXNE: Receive Data register not empty interrupt.
+	USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
 
 	//nastavenie štruktúry
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -127,6 +129,13 @@ void USART2_IRQHandler(void) {
 		if (message == 'm') {
 			pom = pom == 1 ? 0 : 1;
 		}
+	} else if (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == SET) {
+		if (pole[i] != 0) {
+			USART_SendData(USART2, pole[i++]); // Transmit the character
+		} else {
+			USART_ITConfig(USART2, USART_IT_TXE, DISABLE); // Suppress interrupt when empty
+			i = 0;
+		}
 	}
 }
 
@@ -137,13 +146,6 @@ void sendData() {
 		sprintf(pole, "%d.%d V\r\n", intNum, floatNum);
 	} else {
 		sprintf(pole, "%d\r\n", AD_value);
-	}
-
-	int i = 0;
-	while (pole[i] != 0) {
-		USART_SendData(USART2, (char) pole[i++]);
-		while (!USART_GetFlagStatus(USART2, USART_FLAG_TC))
-			;
 	}
 }
 
