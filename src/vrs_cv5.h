@@ -8,15 +8,16 @@
 #ifndef VRS_CV5_H_
 #define VRS_CV5_H_
 
-#include <stddef.h>
 #include "stm32l1xx.h"
 
-void delay(int);
+void adc_init(void);
+void gpio_init(void);
 void usart_init(void);
 
-uint16_t readValue(void);
-void adc_init(void);
-void USART2_IRQHandler();
-void ADC1_IRQHandler();
+void sendData();
+void delay(int);
+
+void ADC1_IRQHandler(void);
+void USART2_IRQHandler(void);
 
 #endif /* VRS_CV5_H_ */
